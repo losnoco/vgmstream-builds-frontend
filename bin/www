@@ -1,0 +1,155 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('vgmstream-builds:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+
+var S3 = require('aws-sdk/clients/s3');
+var s3 = new S3({
+  region: 'us-west-1'
+})
+
+var fs = require('fs');
+
+const { Octokit } = require("@octokit/rest");
+
+const octokit =  new Octokit({
+  auth: process.env.GITHUB_AUTH,
+  userAgent: "vgmstream-builds v0.0.0"
+});
+
+function updateData() {
+
+  //Get ID of latest built commit
+  s3.getObject({
+    Bucket: "vgmstream-builds",
+    Key: "latest_id"
+  }).promise().then(lid => {
+    var sha = lid.Body.toString('utf-16le').trim()
+
+    fs.writeFileSync("latest_id", sha, {encoding: "utf8"})
+    console.log("Sigil updated on", new Date().toString())
+
+  })
+
+  //Get built commits from S3
+  s3.listObjectsV2({
+    Bucket: "vgmstream-builds",
+    Delimiter: "/"
+  }).promise().then(obj => {
+
+    var x = obj.CommonPrefixes.map(c=>c.Prefix.slice(0,-1))
+
+    fs.writeFileSync("builts.json", JSON.stringify(x, null, 4), {encoding: "utf8"})
+    console.log("Built commits updated on", new Date().toString())
+  })
+
+  //Get all files
+  s3.listObjectsV2({
+    Bucket: "vgmstream-builds",
+  }).promise().then(obj => {
+    fs.writeFileSync("list.json", JSON.stringify(obj, null, 4), {encoding: "utf8"})
+    console.log("File list updated on", new Date().toString())
+  })
+
+  //Get commits from GitHub
+
+  octokit.repos.listCommits({
+    owner: "losnoco",
+    repo: "vgmstream",
+  }).then(commits => {
+    fs.writeFileSync("commits.json", JSON.stringify(commits.data, null, 4), {encoding: "utf8"})
+    console.log("Commit list updated on", new Date().toString())
+  })
+}
+
+setInterval(updateData, 300*1000);
+
+updateData()
+
+/**
+ * Create HTTP server.
+ */
+
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

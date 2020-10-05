@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1= title
+  p Through #[a(href="https://github.com/losnoco/vgmstream/actions") GitHub Actions].
+  p Built from commit #[a(href=latestCommitData.html_url) #[code= latest]].
+  .dropdown.pb-3
+    button.btn.btn-secondary.dropdown-toggle#commitDropdown(type="button" data-toggle="dropdown" aria-expanded="false") #[i.fas.fa-history] Other commits
+    ul.dropdown-menu.shadow(aria-labelledby="commitDropdown")
+      each commit in olderCommits
+        li
+          a.dropdown-item(href=`/${commit.sha}`) #[code= commit.sha] #[strong= commit.commit.message]
+  p #[strong= latestCommitData.commit.message] by #[span= latestCommitData.commit.author.name] on #[span= new Date(latestCommitData.commit.author.date).toLocaleString('en-US')]
+  h2 #[i.fab.fa-windows] Windows
+  p Built using Visual Studio 2017.
+  .btn-group.btn-group-lg.pb-3
+    a.btn.btn-success(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/windows/test.zip`) #[i.fas.fa-download] Command line tools, Winamp and XMPlay plugins
+    a.btn.btn-outline-success(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/windows/test.pdb.zip`) Debugging symbols
+  br
+  .btn-group.btn-group-lg.pb-3
+    a.btn.btn-success(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/windows/foo_input_vgmstream.fb2k-component`) #[i.fas.fa-download] foobar2000 components
+    a.btn.btn-outline-success(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/windows/foo_input_vgmstream.pdb.zip `) Debugging symbols
+
+  h2 #[i.fab.fa-ubuntu] Ubuntu
+  p Built using CMake on Ubuntu 18.04. Install these packages first:
+  pre
+    |sudo apt-get install mpg123 libvorbis0a libvorbisenc2 libvorbisfile3 ffmpeg libao4 libjansson4
+  a.btn.btn-lg.btn-success.mb-3.mr-2(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/linux/vgmstream-cli.tar.gz`) #[i.fas.fa-download] Command line tools
+  a.btn.btn-lg.btn-success.mb-3(href=`https://vgmstream-builds.s3-us-west-1.amazonaws.com/${latest}/linux/vgmstream-audacious.tar.gz`) #[i.fas.fa-download] Audacious plug-in

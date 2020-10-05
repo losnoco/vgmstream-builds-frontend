@@ -1,0 +1,13 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css')
+    script(src='https://kit.fontawesome.com/b66098197c.js')
+  body
+    if notLatest
+      .d-block.px-3.py-2.shadow.text-center.text-bold.text-white.bg-dark This is not the latest commit built. #[a.text-white.font-weight-bold(href="/") Click here for the latest commit built.]
+    .container.py-3
+      block content
+
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.bundle.min.js')
