@@ -24,6 +24,10 @@ router.get('/', async function(req, res, next) {
   });
 });
 
+router.get('/latest', (req, res, next) => {
+  res.redirect('/')
+})
+
 router.get('/:sha', async (req, res, next) => {
   var commits = JSON.parse(fs.readFileSync("commits.json", "utf8"));
   var builts = JSON.parse(fs.readFileSync("builts.json", "utf8"))
