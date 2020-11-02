@@ -67,7 +67,7 @@ function updateData() {
   //Get commits from GitHub
 
   octokit.repos.listCommits({
-    owner: "losnoco",
+    owner: "vgmstream",
     repo: "vgmstream",
   }).then(commits => {
     fs.writeFileSync("commits.json", JSON.stringify(commits.data, null, 4), {encoding: "utf8"})
