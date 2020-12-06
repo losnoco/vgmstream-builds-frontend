@@ -28,6 +28,22 @@ router.get('/latest', (req, res, next) => {
   res.redirect('/')
 })
 
+router.get('/latestData', (req, res, next) => {
+  var commits = JSON.parse(fs.readFileSync("commits.json", "utf8"));
+  var builts = JSON.parse(fs.readFileSync("builts.json", "utf8"))
+
+  var bx = []
+
+  builts.forEach(x => bx.push(_.find(commits, {sha: x})))
+
+  let latestCommit = fs.readFileSync("latest_id", {encoding: 'utf-8'});
+  res.json({
+    latestCommitData: _.find(commits, {sha: latestCommit})/*,
+    olderCommits: _.orderBy(_.compact(bx),[(o) => Date.parse(o.commit.author.date)],["desc"])*/
+  });
+
+})
+
 router.get('/:sha', async (req, res, next) => {
   var commits = JSON.parse(fs.readFileSync("commits.json", "utf8"));
   var builts = JSON.parse(fs.readFileSync("builts.json", "utf8"))
