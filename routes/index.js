@@ -7,7 +7,7 @@ var _ = require('lodash');
 
 /* GET home page. */
 router.get('/', async function(req, res, next) {
-
+/*
   var commits = JSON.parse(fs.readFileSync("commits.json", "utf8"));
   var builts = JSON.parse(fs.readFileSync("builts.json", "utf8"))
 
@@ -21,7 +21,8 @@ router.get('/', async function(req, res, next) {
     latest: latestCommit,
     latestCommitData: _.find(commits, {sha: latestCommit}),
     olderCommits: _.orderBy(_.compact(bx),[(o) => Date.parse(o.commit.author.date)],["desc"])
-  });
+  });*/
+  res.redirect('https://vgmstream.org/downloads')
 });
 
 router.get('/latest', (req, res, next) => {
